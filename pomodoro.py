@@ -11,19 +11,26 @@ def tocar_bip(tipo, volume):
     """
     Toca o som correspondente.
     tipo: 'descanso' ou 'trabalho'
-    volume: nível de 1 (suave) a 3 (intenso)
+    volume: nível de 0 (mudo) a 100 (máximo)
     """
+    if volume <= 0:
+        return
+
+    # winsound.Beep não tem controle de volume nativo.
+    # Simulamos o volume ajustando o número de bipes (de 1 a 5)
+    bipes = max(1, int(volume / 20))
+
     frequencia = FREQ_DESCANSO if tipo == 'descanso' else FREQ_TRABALHO
     
     if tipo == 'descanso':
         # Bip de descanso com duração de 2 segundos (2000ms)
         duracao = 2000
-        for _ in range(volume):
+        for _ in range(bipes):
             winsound.Beep(frequencia, duracao)
             time.sleep(0.2)
     else:
         # Bip de trabalho com duração total de 3 segundos: 1.4s de som, 0.2s de silêncio, 1.4s de som
-        for _ in range(volume):
+        for _ in range(bipes):
             winsound.Beep(frequencia, 1400)
             time.sleep(0.2)
             winsound.Beep(frequencia, 1400)
@@ -50,13 +57,20 @@ def executar_timer(duracao_minutos, mensagem, som_tipo, volume):
     
     tocar_bip(som_tipo, volume)
 
+def validar_volume(valor):
+    ivalor = int(valor)
+    if ivalor < 0 or ivalor > 100:
+        raise argparse.ArgumentTypeError(f"O volume deve estar entre 0 e 100. Recebido: {valor}")
+    return ivalor
+
 def main():
     parser = argparse.ArgumentParser(description="Cronômetro Pomodoro em Python")
     parser.add_argument("-f", "--foco", type=float, default=25.0, help="Tempo de foco em minutos (padrão: 25)")
     parser.add_argument("-pc", "--pausa-curta", type=float, default=5.0, help="Tempo de pausa curta em minutos (padrão: 5)")
     parser.add_argument("-pl", "--pausa-longa", type=float, default=15.0, help="Tempo de pausa longa em minutos (padrão: 15)")
     parser.add_argument("-c", "--ciclos", type=int, default=4, help="Número de ciclos de foco antes de uma pausa longa (padrão: 4)")
-    parser.add_argument("-v", "--volume", type=int, choices=[1, 2, 3], default=2, help="Nível do volume do alarme: 1 (baixo), 2 (médio), 3 (alto)")
+    parser.add_argument("-v", "--volume", type=validar_volume, default=50, help="Nível do volume do alarme de 0 a 100 (padrão: 50)")
+    parser.add_argument("-a", "--auto", action="store_true", help="Inicia os próximos ciclos automaticamente sem perguntar")
     
     args = parser.parse_args()
     
@@ -74,7 +88,11 @@ def main():
                 executar_timer(args.pausa_curta, "Pausa Curta para Descanso!", "trabalho", args.volume)
                 
             ciclo += 1
-            input("\nPressione Enter para iniciar o próximo ciclo (ou Ctrl+C para sair)...")
+            if not args.auto:
+                input("\nPressione Enter para iniciar o próximo ciclo (ou Ctrl+C para sair)...")
+            else:
+                print("\nIniciando o próximo ciclo automaticamente em 3 segundos... (Ctrl+C para sair)")
+                time.sleep(3)
             
     except KeyboardInterrupt:
         print("\n\nPomodoro finalizado pelo usuário. Bom descanso!")
