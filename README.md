@@ -36,7 +36,7 @@ Adicionar o diretório do projeto à variável de ambiente `PATH` permite execut
 2. Na janela que abrir, vá até a aba **Avançado** e clique no botão **Variáveis de Ambiente...**.
 3. Na seção **Variáveis do usuário** (ou **Variáveis do sistema**), selecione a variável `Path` e clique em **Editar...**.
 4. Clique no botão **Novo** no canto direito.
-5. Cole o caminho absoluto do diretório do projeto (exemplo: `C:\Users\Nutis\Documents\Hernandes\Pomodoro`).
+5. Cole o caminho absoluto do diretório do projeto (exemplo: `C:\caminho\para\Pomodoro`).
 6. Clique em **OK** em todas as janelas abertas para salvar.
 7. **Reinicie o terminal** (CMD ou PowerShell) para carregar a nova configuração.
 
@@ -45,7 +45,7 @@ Adicionar o diretório do projeto à variável de ambiente `PATH` permite execut
 Abra o PowerShell e execute o comando abaixo (substituindo pelo caminho real da sua pasta):
 
 ```powershell
-[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\Users\Nutis\Documents\Hernandes\Pomodoro", "User")
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\caminho\para\Pomodoro", "User")
 ```
 
 > **Nota:** Após executar o comando acima, feche e abra o terminal para aplicar a alteração.
